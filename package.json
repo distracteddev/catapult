@@ -1,0 +1,29 @@
+{
+  "name": "catapult",
+  "version": "0.0.0",
+  "description": "Node.js Deployment Tool, Intended for use on personal servers",
+  "main": "app.js",
+  "dependencies": {
+    "pushover": "~1.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "node test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/distracteddev/catapult.git"
+  },
+  "keywords": [
+    "Deploy",
+    "Deployment",
+    "Tool",
+    "git-based",
+    "deploy",
+    "git",
+    "server"
+  ],
+  "author": "Zeus Lalkaka <lalkaka.zeus@gmail.com>",
+  "license": "BSD",
+  "readmeFilename": "README.md"
+}
