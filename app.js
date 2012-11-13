@@ -6,6 +6,10 @@ var pushover = require('pushover'),
 repos.on('push', function (push) {
     console.log('push ' + push.repo + '/' + push.commit + ' (' + push.branch + ')');
     push.accept();
+    //.clone target repo
+    // npm install
+    // start app with forever
+    // send logs somewhere
 });
 
 repos.on('fetch', function (fetch) {
