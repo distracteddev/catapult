@@ -17,8 +17,14 @@ repos.on('fetch', function (fetch) {
     fetch.accept();
 });
 
+repos.on('info', function (info) {
+  console.log('info ' + info.repo);
+  info.accept();
+});
+
 var http = require('http');
 var server = http.createServer(function (req, res) {
+    console.log(req.url, req.body, req.method);
     repos.handle(req, res);
 });
 server.listen(7005);
