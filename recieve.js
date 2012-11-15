@@ -1,9 +1,20 @@
 var pushReceive = require('github-push-receive');
 var http = require('http');
+var qs  = require('querystring');
 
 var server = http.createServer(function (req, res) {
     if (req.url.split('/')[1] === 'hook') {
-        req.pipe(pushReceive('http://localhost:7005')).pipe(res);
+        console.log(req);
+        req.setEncoding('utf8');
+        if (req.method === 'POST') {
+            var body = '';
+            req.on('data', function(data) {
+                body += data;
+            });
+            req.on('end', function() {
+                console.log("Body Parsed", JSON.parse(qs.parse(body).payload));
+            });
+        }
     } else {
         console.log(req);
         res.end('beep boop\n');
