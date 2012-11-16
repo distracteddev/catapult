@@ -1,18 +1,31 @@
-var pushReceive = require('github-push-receive');
 var http = require('http');
 var qs  = require('querystring');
+var handler = require('./handle');
 
 var server = http.createServer(function (req, res) {
     if (req.url.split('/')[1] === 'hook') {
-        console.log(req);
         req.setEncoding('utf8');
         if (req.method === 'POST') {
+            // buffer for the buffer
             var body = '';
+            // parse the body
             req.on('data', function(data) {
                 body += data;
             });
             req.on('end', function() {
-                console.log("Body Parsed", JSON.parse(qs.parse(body).payload));
+              var parsed = qs.parse(body);
+              try {
+                if (parsed.payload) {
+                  // extract the git hook payload
+                  parsed = parsed.payload;
+                }
+                parsed = JSON.parse(parsed);
+                console.log("Body Parsed", parsed);
+                res.end("Hook Successfully Accepted");
+                handler(parsed);
+              } catch (e) {
+                res.end("Error, Bad JSON Provided");
+              }
             });
         }
     } else {
