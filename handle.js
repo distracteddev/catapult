@@ -14,6 +14,7 @@ var path   = require('path'),
     git    = require('gift'),
     npm    = require('npm'),
     ipc    = require('./ipc'),
+    forever = require('forever-monitor'),
     mkdirp = require('mkdirp');
 
 // Load an empty config for npm
@@ -89,7 +90,7 @@ function updateSettingsForRepo(payload, pkg) {
   });
 
   console.log("Setting: ", payload.basePort, routes);
-  npmInstall(payload.directory);
+  npmInstall(payload, pkg);
 
 }
 
@@ -121,14 +122,28 @@ function buildRoutes(payload, pkg) {
   return routes;
 }
 
-function npmInstall(path) {
-  console.log("installing npm modules for", path);
-  npm.prefix = path;
-  npm.globalPrefix = path;
-  npm.localPrefix = path;
+function npmInstall(payload, pkg) {
+  var dir = payload.directory;
+  console.log("installing npm modules for", dir);
+  npm.prefix = dir;
+  npm.globalPrefix = dir;
+  npm.localPrefix = dir;
   npm.commands.install([], function(err, data) {
     if (err) { throw err; }
-    // Start the app
+    // TODO: Notify User on Error (Email / OSX)
+    else     { launchForever(payload, pkg); }
+  });
+}
+
+
+function launchForever(payload, pkg) {
+  var dir = payload.directory;
+  var child = new (forever.Monitor)(startFile, {
+    cwd: dir,
+    max: 5,
+    silent: false,
+    pidFile: path.join(dir, 'my.pid'),
+    env: { PORT: payload.basePort + ENV }
   });
 }
 
