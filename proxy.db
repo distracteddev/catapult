@@ -1,0 +1,6 @@
+{"key":"https://github.com/distracteddev/catapult","val":{"basePort":3000}}
+{"key":"nextPort","val":3004}
+{"key":"https://github.com/distracteddev/catapult","val":{"basePort":3000,"routes":{"catapult.distracteddev.com":"127.0.0.1:3001","catapult-staging.distracteddev.com":"127.0.0.1:3002","catapult-dev.distracteddev.com":"127.0.0.1:3003"}}}
+{"key":"https://github.com/distracteddev/Soapbox","val":{"basePort":3004}}
+{"key":"nextPort","val":3008}
+{"key":"https://github.com/distracteddev/Soapbox","val":{"basePort":3004,"routes":{"soapbox.distracteddev.com":"127.0.0.1:3005","soapbox-staging.distracteddev.com":"127.0.0.1:3006","soapbox-dev.distracteddev.com":"127.0.0.1:3007"}}}

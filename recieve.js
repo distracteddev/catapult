@@ -1,6 +1,13 @@
 var http = require('http');
 var qs  = require('querystring');
+var sugar = require('sugar');
 var handler = require('./handle');
+var ipc     = require('./ipc.js');
+var proxy   = require('./proxy.js');
+
+ipc.on('test', function(evt) {
+  console.log('test event', evt);
+});
 
 var server = http.createServer(function (req, res) {
     if (req.url.split('/')[1] === 'hook') {
@@ -20,12 +27,14 @@ var server = http.createServer(function (req, res) {
                   parsed = parsed.payload;
                 }
                 parsed = JSON.parse(parsed);
-                console.log("Body Parsed", parsed);
+                //console.log("Body Parsed", parsed);
                 res.end("Hook Successfully Accepted");
-                handler(parsed);
               } catch (e) {
+                console.log(e);
                 res.end("Error, Bad JSON Provided");
+                return;
               }
+              handler(parsed);
             });
         }
     } else {
@@ -34,3 +43,4 @@ var server = http.createServer(function (req, res) {
     }
 });
 server.listen(8050);
+console.log("Starting reciever on port ", 8050);
