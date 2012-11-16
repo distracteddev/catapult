@@ -20,13 +20,13 @@ var path   = require('path'),
 // Load an empty config for npm
 npm.load({});
 
-var branchesWeCareAbout = ['master', 'production', 'staging', 'development', 'stg', 'dev'];
+var branchMap = {'master': 0, 'production': 0, 'staging':1, 'development':2, 'stg':1, 'dev': 2};
 
 function handleHook(payload) {
   // Check if branch pushed is one of the ones we care about
   payload.branch = payload.ref.split('/')[2];
   console.log("Detected a push for", payload.repository.name, payload.branch);
-  if (branchesWeCareAbout.none(payload.branch)) {
+  if (!(payload.branch in branchMap)) {
     console.log("Detected a push for a branch we don't care about: ", payload.ref);
     return;
   }
@@ -131,20 +131,42 @@ function npmInstall(payload, pkg) {
   npm.commands.install([], function(err, data) {
     if (err) { throw err; }
     // TODO: Notify User on Error (Email / OSX)
+    // TODO: Run Test Suite
     else     { launchForever(payload, pkg); }
   });
 }
 
 
 function launchForever(payload, pkg) {
-  var dir = payload.directory;
-  var child = new (forever.Monitor)(startFile, {
+  var dir = payload.directory,
+      portOffset = branchMap[payload.branch],
+      node_env = (portOffset < 2) ? 'production' : 'development',
+      child = new (forever.Monitor)(startFile, {
     cwd: dir,
     max: 5,
     silent: false,
     pidFile: path.join(dir, 'my.pid'),
-    env: { PORT: payload.basePort + ENV }
+    // each app has a basePort, and the env determines the offset
+    env: { 
+      PORT: payload.basePort + portOffset,
+      NODE_ENV: node_env
+    },
+    logfile: path.join(dir, 'forever.log'),
+    outFile: path.join(dir, 'out.log'),
+    errFile: path.join(dir, 'error.log')
   });
+
+  child.on('exit', function() {
+    var msg = [
+      'EXIT:',
+      payload.repository.name,
+      payload.branch,
+      'has exiteed'
+    ].join(' ' );
+
+    console.log(msg);
+  });
+  child.start();
 }
 
 module.exports = handleHook;
