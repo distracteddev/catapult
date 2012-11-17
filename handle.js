@@ -51,6 +51,7 @@ function createLocalRepo(payload) {
   mkdirp.sync(payload.directory);
   // init the git repo
   git.init(payload.directory, function(err, params) {
+    if (err) return console.error(err);
     var repo = git(params.path);
     repo.remote_add('origin', payload.repository.url, function(err, params) {
       syncLocalRepo(payload);
@@ -66,10 +67,15 @@ function createLocalRepo(payload) {
 function syncLocalRepo(payload) {
   var repo = git(payload.directory);
   repo.remote_fetch('origin', function(err, params) {
+    if (err) return console.error(err);
     repo.checkout(payload.branch, function(err, params) {
-      var pkgPath = path.join(payload.directory, 'package.json');
-      var pkg = require(pkgPath);
-      updateSettingsForRepo(payload, pkg);
+      if (err) return console.error(err);
+      repo.git('pull', function(err, params) {
+        if (err) return console.error(err);
+        var pkgPath = path.join(payload.directory, 'package.json');
+        var pkg = require(pkgPath);
+        updateSettingsForRepo(payload, pkg);
+      });
     });
   });
 }
@@ -105,9 +111,9 @@ function buildRoutes(payload, pkg) {
     routes['www.' + domain] = localHost + (basePort + 0);
     routes[domain]          = localHost + (basePort + 0);
     // staging
-    routes['staging' + domain] = localHost + (basePort + 1);
+    routes['staging.' + domain] = localHost + (basePort + 1);
     // development
-    routes['dev' + domain] = localHost + (basePort + 2);
+    routes['dev.' + domain] = localHost + (basePort + 2);
   } else if (subdomain) {
     var HOST_NAME = 'distracteddev.com';
     // production
@@ -131,7 +137,10 @@ function npmInstall(payload, pkg) {
     if (err) { throw err; }
     // TODO: Notify User on Error (Email / OSX)
     // TODO: Run Test Suite
-    else     { launchForever(payload, pkg); }
+    else {
+      console.log("All npm modules installed sucessfully");
+      launchForever(payload, pkg); 
+    }
   });
 }
 

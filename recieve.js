@@ -38,7 +38,7 @@ var server = http.createServer(function (req, res) {
             });
         }
     } else {
-        console.log(req);
+        console.log("Non Hook Request Detected");
         res.end('beep boop\n');
     }
 });
