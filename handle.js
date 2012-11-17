@@ -42,7 +42,7 @@ function cloneProject(payload) {
     console.log("Repo not found, creating it now...");
     createLocalRepo(payload);
   } else {
-    syncLocalRepo(payload.directory);
+    syncLocalRepo(payload);
   }
 }
 
@@ -53,7 +53,7 @@ function createLocalRepo(payload) {
   git.init(payload.directory, function(err, params) {
     var repo = git(params.path);
     repo.remote_add('origin', payload.repository.url, function(err, params) {
-      syncLocalRepo(payload, repo);
+      syncLocalRepo(payload);
     });
   });
   // create a db object for this repo
@@ -63,10 +63,8 @@ function createLocalRepo(payload) {
   db.set('nextPort', basePort+4);
 }
 
-function syncLocalRepo(payload, repo) {
-  if (typeof repo === 'string') {
-    repo = git(repo);
-  }
+function syncLocalRepo(payload) {
+  var repo = git(payload.directory);
   repo.remote_fetch('origin', function(err, params) {
     repo.checkout(payload.branch, function(err, params) {
       var pkgPath = path.join(payload.directory, 'package.json');
@@ -94,6 +92,7 @@ function updateSettingsForRepo(payload, pkg) {
 
 }
 
+// TODO: Move to helper.js
 function buildRoutes(payload, pkg) {
   var routes = {},
       domain = pkg.domain,
@@ -103,20 +102,20 @@ function buildRoutes(payload, pkg) {
 
   if (domain) {
     // production
-    routes['www.' + domain] = localHost + (basePort + 1);
-    routes[domain]          = localHost + (basePort + 1);
+    routes['www.' + domain] = localHost + (basePort + 0);
+    routes[domain]          = localHost + (basePort + 0);
     // staging
-    routes['staging' + domain] = localHost + (basePort + 2);
+    routes['staging' + domain] = localHost + (basePort + 1);
     // development
-    routes['dev' + domain] = localHost + (basePort + 3);
+    routes['dev' + domain] = localHost + (basePort + 2);
   } else if (subdomain) {
     var HOST_NAME = 'distracteddev.com';
     // production
-    routes[subdomain + '.' + HOST_NAME] = localHost + (basePort + 1);
+    routes[subdomain + '.' + HOST_NAME] = localHost + (basePort + 0);
     // staging
-    routes[subdomain + '-staging.' + HOST_NAME] = localHost + (basePort + 2);
+    routes[subdomain + '-staging.' + HOST_NAME] = localHost + (basePort + 1);
     // development
-    routes[subdomain + '-dev.' + HOST_NAME] = localHost + (basePort + 3);
+    routes[subdomain + '-dev.' + HOST_NAME] = localHost + (basePort + 2);
   }
 
   return routes;
@@ -137,14 +136,31 @@ function npmInstall(payload, pkg) {
 }
 
 
+// TODO: Write doc blocks
 function launchForever(payload, pkg) {
   var dir = payload.directory,
       portOffset = branchMap[payload.branch],
       node_env = (portOffset < 2) ? 'production' : 'development',
-      child = new (forever.Monitor)(startFile, {
+      startFile;
+
+  // Detect the name of the file we need to run
+  if (pkg.scripts.start) {
+    startFile = pkg.scripts.start.replace('node ', '');
+  } else {
+    var names = ['app.js','server.js', 'start.js'].filter(function(fileName) {
+      return fs.existsSync(path.join(payload.directory, fileName));
+    });
+    startFile = names[0];
+  }
+
+  // join the name with the cwd
+  startFile = path.join(dir, startFile);
+
+  // Set-up the forever process.
+  var child = new (forever.Monitor)(startFile, {
     cwd: dir,
     max: 5,
-    silent: false,
+    silent: true,
     pidFile: path.join(dir, 'my.pid'),
     // each app has a basePort, and the env determines the offset
     env: { 
@@ -156,6 +172,7 @@ function launchForever(payload, pkg) {
     errFile: path.join(dir, 'error.log')
   });
 
+  // Listen for child events
   child.on('exit', function() {
     var msg = [
       'EXIT:',
@@ -166,6 +183,8 @@ function launchForever(payload, pkg) {
 
     console.log(msg);
   });
+
+  // Launch forever, all systems go.
   child.start();
 }
 
