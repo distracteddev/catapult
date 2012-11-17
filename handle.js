@@ -93,7 +93,7 @@ function updateSettingsForRepo(payload, pkg) {
     ipc.emit('refreshProxy');
   });
 
-  console.log("Setting: ", payload.basePort, routes);
+  console.log("Setting Routes: ", routes);
   npmInstall(payload, pkg);
 
 }
