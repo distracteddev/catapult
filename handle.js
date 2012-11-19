@@ -276,7 +276,7 @@ function launchForever(payload, pkg) {
 
   child.on('stop', function(err, proc) {
     if (err) console.error(err);
-    paylod.pid = 0;
+    payload.pid = 0;
     updateStatus('STOPPED', payload);
     var msg = {
       type: 'stopped/fail',
