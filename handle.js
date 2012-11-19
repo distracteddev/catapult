@@ -101,7 +101,10 @@ function syncLocalRepo(payload) {
 function updateSettingsForRepo(payload, pkg) {
   // create a routes object based on routes/domain/subdomain option
   // within the projects package.json
-  payload.basePort = db.get(payload.repository.url).basePort;
+  var repoData = db.get(payload.repository.url) || {};
+  // If we don't have a basePort at this point, give a default port
+  // that is out of the range of the nominal case
+  payload.basePort =  repoData.basePort || 9000;
   var routes = pkg.routes || buildRoutes(payload, pkg);
   // stash them incase we need them later;
   payload.routes = routes;

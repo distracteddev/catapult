@@ -48,6 +48,8 @@ Notifier.send = function(msg, payload) {
 
   // Fire off the notification
   this.emit('notification', notif);
+  // TODO: Remove this once I'm confident that all the right
+  // notifications are being sent.
   console.log("Broadcasting notification to client:\n", notif);
 };
 
