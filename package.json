@@ -10,7 +10,9 @@
     "gift": "0.0.5",
     "mkdirp": "~0.3.4",
     "npm": "~1.1.65",
-    "forever-monitor": "~1.1.0"
+    "forever-monitor": "~1.1.0",
+    "colors": "~0.6.0-1",
+    "tinyhook": "~0.1.1"
   },
   "devDependencies": {},
   "scripts": {

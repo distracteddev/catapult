@@ -6,24 +6,21 @@ var proxy = require('http-proxy'),
 
 
 
-
+// our 'global' proxy table.
 var proxyTable;
+
 var startServer = function(options) {
   var server = proxy.createServer(options);
   server.listen(80);
+  // stash our proxyTable instance
   proxyTable = server.proxy.proxyTable;
-  server.proxy.on('end', function() {
-    console.log("Request proxied");
-  });
-  proxyTable.on('routes', function(routes) {
-    console.log("new routes", routes);
-  });
 };
 
 db.on('load', function() {
 
   var options = { hostnameOnly: true },
       router  = {};
+
   db.forEach(function(repo, options) {
     if (options.routes) {
       Object.merge(router, options.routes);
@@ -38,6 +35,8 @@ db.on('load', function() {
   } else {
   // otherwise, simply load the proxy table
     console.log("Refreshing the proxy table...");
+    // the next two lines are copied straight from the http-proxy source
+    // for handling new entries when the proxy-table changes.
     proxyTable.setRoutes(options.router);
     proxyTable.emit('routes', options.router);
   }
@@ -46,6 +45,8 @@ db.on('load', function() {
 
 
 ipc.on('refreshProxy', function() {
+  // fires the above load handler after
+  // reading the newest entries from proxy.db
   db._load();
 });
 

@@ -4,10 +4,7 @@ var sugar = require('sugar');
 var handler = require('./handle');
 var ipc     = require('./ipc.js');
 var proxy   = require('./proxy.js');
-
-ipc.on('test', function(evt) {
-  console.log('test event', evt);
-});
+var colors  = require('colors');
 
 var server = http.createServer(function (req, res) {
     if (req.url.split('/')[1] === 'hook') {
@@ -43,4 +40,4 @@ var server = http.createServer(function (req, res) {
     }
 });
 server.listen(8050);
-console.log("Starting reciever on port ", 8050);
+console.log("Starting reciever on port ".green, String(8050).yellow);
