@@ -8,7 +8,7 @@
  *
 **/
 var path   = require('path'),
-    db     = require('dirty')('proxy.db'),
+    db     = require('./db').proxyDB,
     fs     = require('fs'),
     git    = require('gift'),
     npm    = require('npm'),
@@ -17,19 +17,6 @@ var path   = require('path'),
     colors = require('colors'),
     Notifier  = require('./notifier'),
     mkdirp = require('mkdirp');
-
-
-//TODO: get this the fuck out of here
-// function #merge
-// @param {string} key
-// @param {objext} Object to merge
-db.merge = function(key, obj) {
-  var current = db.get(key) || {};
-  // true indicates deep merge
-  Object.merge(current, obj, true);
-  db.set(key, current);
-};
-
 
 // Load an empty config for npm
 npm.load({});
@@ -184,6 +171,8 @@ function launchForever(payload, pkg) {
       node_env = (portOffset < 2) ? 'production' : 'development',
       startFile;
 
+
+  // TODO: Move into helpers
   // We need to detect the name of the start
   if (pkg.scripts.start) {
     startFile = pkg.scripts.start.replace('node ', '');
@@ -274,18 +263,6 @@ function launchForever(payload, pkg) {
     Notifier.send(msg, payload);
   });
 
-  child.on('stop', function(err, proc) {
-    if (err) console.error(err);
-    payload.pid = 0;
-    updateStatus('STOPPED', payload);
-    var msg = {
-      type: 'stopped/fail',
-      text: 'The Application Stopped'
-    };
-    Notifier.send(msg, payload);
-  });
-
-
   child.on('error', function(err) {
     console.error("Error in child app", err);
     var msg = {
@@ -298,7 +275,7 @@ function launchForever(payload, pkg) {
   // Launch forever, all systems go.
   child = child.start();
   // save the child for later
-  CHILDREN[payload.repository.url] = child;
+  CHILDREN[payload.repository.url + payload.branch] = child;
   console.log("Starting".blue, payload.repository.name.green, payload.branch.yellow);
 }
 
