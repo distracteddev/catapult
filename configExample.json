@@ -1,0 +1,8 @@
+{
+  "hostname":"localhost",
+  "hook_port": 8050,
+  "notifier_port": 1050,
+  "plugins": {
+
+  }
+}

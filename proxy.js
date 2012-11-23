@@ -2,16 +2,18 @@ var proxy = require('http-proxy'),
     sugar = require('sugar'),
     db    = require('dirty')('proxy.db'),
     ipc   = require('./ipc'),
+    config = require('./config'),
     fs    = require('fs');
 
 
 
+var PORT = config.proxy_port || 80;
 // our 'global' proxy table.
 var proxyTable;
 
 var startServer = function(options) {
   var server = proxy.createServer(options);
-  server.listen(80);
+  server.listen(PORT);
   // stash our proxyTable instance
   proxyTable = server.proxy.proxyTable;
 };
@@ -31,7 +33,7 @@ db.on('load', function() {
   // if the proxy has not started, start it
   if (!proxyTable) {
     startServer(options);
-    console.log("Starting proxy with: ", options);
+    console.log("Starting proxy on port:", String(PORT).yellow, "with routes:\n", options.router);
   } else {
   // otherwise, simply load the proxy table
     console.log("Refreshing the proxy table...");

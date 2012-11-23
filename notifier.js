@@ -1,9 +1,10 @@
 var Hook = require('tinyhook').Hook,
+    config = require('./config'),
     colors  = require('colors');
 
 var serverOpts = {
-  port: 1050,
-  host: process.env.TH_HOST || 'seam.io'
+  port: config.notifier_port,
+  host: config.hostname || 'localhost'
 };
 
 var Notifier = new Hook(serverOpts);
@@ -12,14 +13,16 @@ var tailLog = 'osascript -e \'tell app "Terminal"\n\tdo script "ssh root@{host} 
 // tails both the err and the out log files
 var tailLogs = 'osascript -e \'tell app "Terminal"\n\tdo script "ssh root@{host} tail -f -n 200 {outFile} -f -n {errFile}';
 
-Notifier.listen(function(err) {
-  if (err) {
-    // TODO: Log and continue
-    throw err;
-  } else {
-    console.log("Notifier Started on ".green, JSON.stringify(serverOpts).yellow);
-  }
-});
+if (serverOpts.port && serverOpts.host) {
+  Notifier.listen(function(err) {
+    if (err) {
+      // TODO: Log and continue
+      throw err;
+    } else {
+      console.log("OSX-Notifier Started with".green, JSON.stringify(serverOpts).yellow);
+    }
+  });
+}
 
 
 // TODO: Remove this hacky bullshit once we refactor the handle submodule

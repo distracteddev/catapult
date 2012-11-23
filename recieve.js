@@ -1,10 +1,11 @@
 var http = require('http');
-var qs  = require('querystring');
-var sugar = require('sugar');
-var handler = require('./handle');
-var ipc     = require('./ipc.js');
-var proxy   = require('./proxy.js');
-var colors  = require('colors');
+    qs  = require('querystring'),
+    sugar = require('sugar'),
+    handler = require('./handle'),
+    ipc     = require('./ipc.js'),
+    proxy   = require('./proxy.js'),
+    config  = require('./config'),
+    colors  = require('colors');
 
 var server = http.createServer(function (req, res) {
     if (req.url.split('/')[1] === 'hook') {
@@ -39,5 +40,7 @@ var server = http.createServer(function (req, res) {
         res.end('beep boop\n');
     }
 });
-server.listen(8050);
-console.log("Starting reciever on port ".green, String(8050).yellow);
+
+var port = config.hook_port || 8050;
+server.listen(port);
+console.log("Starting git-hook reciever on port".green, String(port).yellow);

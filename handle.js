@@ -16,6 +16,7 @@ var path   = require('path'),
     forever = require('forever-monitor'),
     colors = require('colors'),
     Notifier  = require('./notifier'),
+    buildRoutes = require('./helpers'),
     mkdirp = require('mkdirp');
 
 // Load an empty config for npm
@@ -30,8 +31,7 @@ function handleHook(payload) {
   // Note: If no branch is provided, assume master.
   payload.branch = payload.branch || payload.ref.split('/')[2] || 'master';
   console.log("Detected a push for", payload.repository.name, payload.branch);
-  if (!(payload.branch in BRANCH_MAP) ||
-      payload.repository.name.toLowerCase() === 'catapult') {
+  if (!(payload.branch in BRANCH_MAP)) {
     console.log("Detected a push for a branch we don't care about: ", payload.ref || payload.branch);
     return;
   }
@@ -106,42 +106,6 @@ function updateSettingsForRepo(payload, pkg) {
   console.log("Setting Routes: ", routes);
   npmInstall(payload, pkg);
 
-}
-
-// TODO: Move to helper.js
-// Perhaps we should only build the route for the branch
-// being currently deployed. Then we can more easily handle
-// any branch in the future just by letting it through the hook.
-function buildRoutes(payload, pkg) {
-  var routes = {},
-      domain = pkg.domain,
-      localHost = '127.0.0.1:',
-      basePort = +payload.basePort,
-      subdomain = pkg.subdomain || pkg.name;
-
-  if (domain) {
-    domain = domain.toLowerCase();
-    // production
-    routes['www.' + domain] = localHost + (basePort + 0);
-    routes[domain]          = localHost + (basePort + 0);
-    // staging
-    routes['staging.' + domain] = localHost + (basePort + 1);
-    // development
-    routes['dev.' + domain] = localHost + (basePort + 2);
-  }
-
-  if (subdomain) {
-    subdomain = subdomain.toLowerCase();
-    var HOST_NAME = 'distracteddev.com';
-    // production
-    routes[subdomain + '.' + HOST_NAME] = localHost + (basePort + 0);
-    // staging
-    routes[subdomain + '-staging.' + HOST_NAME] = localHost + (basePort + 1);
-    // development
-    routes[subdomain + '-dev.' + HOST_NAME] = localHost + (basePort + 2);
-  }
-
-  return routes;
 }
 
 function npmInstall(payload, pkg) {
