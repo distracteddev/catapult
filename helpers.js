@@ -1,31 +1,16 @@
-exports.buildRoutes = function buildRoutes(payload, pkg) {
-  var routes = {},
-      domain = pkg.domain,
-      localHost = '127.0.0.1:',
-      basePort = +payload.basePort,
-      subdomain = pkg.subdomain || pkg.name;
+var fs   = require('fs'),
+    path = require('path');
 
-  if (domain) {
-    domain = domain.toLowerCase();
-    // production
-    routes['www.' + domain] = localHost + (basePort + 0);
-    routes[domain]          = localHost + (basePort + 0);
-    // staging
-    routes['staging.' + domain] = localHost + (basePort + 1);
-    // development
-    routes['dev.' + domain] = localHost + (basePort + 2);
+exports.getStartFile = function (pkg, directory) {
+  var startFile;
+  if (pkg && pkg.scripts && pkg.scripts.start) {
+    startFile = pkg.scripts.start.replace('node ', '');
+  } else {
+  // If its not defined, hunt for it using common names.
+    var names = ['app.js','server.js', 'start.js'].filter(function(fileName) {
+      return fs.existsSync(path.join(directory, fileName));
+    });
+    startFile = names[0];
   }
-
-  if (subdomain) {
-    subdomain = subdomain.toLowerCase();
-    var HOST_NAME = 'distracteddev.com';
-    // production
-    routes[subdomain + '.' + HOST_NAME] = localHost + (basePort + 0);
-    // staging
-    routes[subdomain + '-staging.' + HOST_NAME] = localHost + (basePort + 1);
-    // development
-    routes[subdomain + '-dev.' + HOST_NAME] = localHost + (basePort + 2);
-  }
-
-  return routes;
+  return path.join(directory, startFile) || null;
 };

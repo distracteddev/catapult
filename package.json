@@ -12,12 +12,16 @@
     "npm": "~1.1.65",
     "forever-monitor": "~1.1.0",
     "colors": "~0.6.0-1",
-    "tinyhook": "~0.1.1"
+    "tinyhook": "~0.1.1",
+    "restify": "~1.4.4"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "mocha": "*",
+    "chai": "*"
+  },
   "scripts": {
     "start": "node recieve.js",
-    "test": "node test"
+    "test": "mocha --watch -r chai -u qunit -t 20000 test"
   },
   "repository": {
     "type": "git",

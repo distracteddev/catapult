@@ -1,6 +1,6 @@
 var proxy = require('http-proxy'),
     sugar = require('sugar'),
-    db    = require('dirty')('proxy.db'),
+    db    = require('./db'),
     ipc   = require('./ipc'),
     config = require('./config'),
     fs    = require('fs');

@@ -8,7 +8,7 @@
  *
 **/
 var path   = require('path'),
-    db     = require('./db').proxyDB,
+    db     = require('./db'),
     fs     = require('fs'),
     git    = require('gift'),
     npm    = require('npm'),
@@ -120,7 +120,7 @@ function npmInstall(payload, pkg) {
     // TODO: Run Test Suite
     else {
       console.log("All npm modules installed sucessfully".green);
-      launchForever(payload, pkg); 
+      launchForever(payload, pkg);
     }
   });
 }
