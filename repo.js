@@ -25,12 +25,8 @@ function Repo(payload) {
   this.normalizePayload(payload);
   this.pkgDotJSON = null;
   var port;
-  console.log("new port",port =  db.get('nextPort'));
   this.port = +db.get('nextPort');
-  db.rm(this.id);
-  db.set('nextPort', this.port+1, function(err) {
-    console.log('Done setting port', port);
-  });
+  db.set('nextPort', this.port+1);
 }
 
 
@@ -64,7 +60,15 @@ Repo.prototype.normalizePayload = function(payload) {
 
 
 Repo.prototype.save = function(cb) {
-  db.set(this.id, this, cb);
+  //var saveObj = this;
+  var saveObj = Object.clone(this, false);
+  // monitor is a class that should not be serialized, we simply
+  // store it to the Repo object so each repo has a reference
+  // to its child forever-monitor instance.
+  if (saveObj.monitor) {
+    saveObj.monitor = null;
+  }
+  db.set(this.id, saveObj, cb);
 };
 
 Repo.prototype.retrieve = function() {
@@ -210,7 +214,6 @@ Repo.prototype.start = function (cb) {
     return;
   }
 
-  console.log("SETTING PORT in ENV", this.port);
   var childEnv = {
     PORT: this.port,
     NODE_ENV: node_env
@@ -229,11 +232,12 @@ Repo.prototype.start = function (cb) {
   }
 
   // Set-up the forever process.
-  this.monitor = new (forever.Monitor)(startFile, {
+  var child = new (forever.Monitor)(startFile, {
     cwd: dir,
     max: 10,
     silent: true,
     env: childEnv,
+    spawnWith: {},
     // each app has a basePort, and the env determines the offset
     logfile: path.join(dir, 'forever.log'),
     outFile: path.join(dir, 'out.log'),
@@ -241,11 +245,11 @@ Repo.prototype.start = function (cb) {
   });
 
   this.bindChildListeners();
-  //console.log(this.monitor.child);
-  this.monitor = this.monitor.start();
-  //console.log(this.monitor.child);
-  //this.save();
-
+  child = child.start();
+  this.childData = child.data;
+  this.pid = this.childData.pid;
+  this.monitor = child;
+  this.save();
 
   cb(null);
 };

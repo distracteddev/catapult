@@ -13,22 +13,31 @@ var tailLog = 'osascript -e \'tell app "Terminal"\n\tdo script "ssh root@{host} 
 // tails both the err and the out log files
 var tailLogs = 'osascript -e \'tell app "Terminal"\n\tdo script "ssh root@{host} tail -f -n 200 {outFile} -f -n {errFile}';
 
-if (serverOpts.port && serverOpts.host) {
-  Notifier.listen(function(err) {
-    if (err) {
-      // TODO: Log and continue
-      throw err;
-    } else {
-      console.log("OSX-Notifier Started with".green, JSON.stringify(serverOpts).yellow);
-    }
-  });
-}
 
+var STARTED = false;
+
+Notifier.start = function(callback) {
+  if (serverOpts.port && serverOpts.host) {
+    Notifier.listen(function(err) {
+      if (err) {
+        // TODO: Log and continue
+        throw err;
+      } else {
+        callback(null);
+        console.log("OSX-Notifier Started with".green, JSON.stringify(serverOpts).yellow);
+        STARTED = true;
+      }
+    });
+  }
+};
 
 // TODO: Remove this hacky bullshit once we refactor the handle submodule
 var BRANCH_MAP = {'master': 0, 'production': 0, 'staging':1, 'development':2, 'stg':1, 'dev': 2};
 
 Notifier.send = function(msg, payload) {
+  if (!STARTED) {
+    throw new Error('You must start the Notifier before trying to send messages through it');
+  }
   var app = {},
       notif = {};
   // Pull the details we care about out of payload
@@ -55,13 +64,6 @@ Notifier.send = function(msg, payload) {
   // notifications are being sent.
   console.log("Broadcasting notification to client:\n", notif);
 };
-
-var Notification = function() {
-
-
-};
-
-
 
 
 module.exports = Notifier;

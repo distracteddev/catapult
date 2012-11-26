@@ -1,10 +1,15 @@
+// Set the env before loading the database;
+var config = require('../config');
+config.env = 'testing';
+var db     = require('../db');
+
 var should = require('chai').should(),
     qs     = require('querystring'),
     fs     = require('fs'),
     npm    = require('npm'),
-    db     = require('../db'),
-    config = require('../config'),
     Repo   = require('../repo');
+
+
 
 
 // mock npm install so our tests dont take 40 seconds
@@ -21,6 +26,14 @@ var SAMPLE_API_PAYLOAD = {
 };
 
 suite('Repo');
+
+// Since Mocha Tests are run sychronously, our first
+// test ensures node-dirty has finishing loading.
+test('#db loaded', function(done) {
+  db.on('load', function(count) {
+    done(null);
+  });
+});
 
 test('#init with api payload', function() {
   var payload = SAMPLE_API_PAYLOAD;
@@ -46,12 +59,12 @@ test('#init with git hook payload', function() {
 });
 
 test('#save and retrieve', function (done) {
-  var repo = new Repo(SAMPLE_API_PAYLOAD);
-  repo.save(function (err) {
-    repo.should.deep.equal(db.get(repo.id));
-    repo.should.deep.equal(repo.retrieve());
-    done(err);
-  });
+    var repo = new Repo(SAMPLE_API_PAYLOAD);
+    repo.save(function (err) {
+      repo.should.deep.equal(db.get(repo.id));
+      repo.should.deep.equal(repo.retrieve());
+      done(err);
+    });
 });
 
 
