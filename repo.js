@@ -31,7 +31,7 @@ function Repo(payload) {
   db.set('nextPort', this.port+1);
 }
 
-Repo.protoype.create = function (payload) {
+Repo.prototype.create = function (payload) {
   return new Repo(payload);
 };
 
