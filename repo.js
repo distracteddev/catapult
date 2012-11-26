@@ -190,7 +190,7 @@ Repo.prototype.npmInstall = function (cb) {
       return;
     }
     // TODO: Notify User on Error (Email / OSX)
-    // TODO: Run Test Suite
+    // TODO: Run Test Suite and save/host output.
     else {
       //console.log("All npm modules installed sucessfully".green);
       cb(null);
@@ -258,6 +258,11 @@ Repo.prototype.start = function (cb) {
   cb(null);
 };
 
+// TODO: The Child Listeners should listen on
+// 'start', 'restart', 'exit', and 'error' and 
+// update this.status as well as send out notifications
+// using Notifier.send. See Handle.js L189-244 for the old
+// implementation.
 Repo.prototype.bindChildListeners = function () {
 
 
