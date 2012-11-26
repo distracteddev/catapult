@@ -33,7 +33,7 @@ function Repo(payload) {
 
 Repo.protoype.create = function (payload) {
   return new Repo(payload);
-}
+};
 
 Repo.prototype.normalizePayload = function(payload) {
   // these params are only passed via a git-hook and are not present
