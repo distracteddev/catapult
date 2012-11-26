@@ -21,6 +21,8 @@ npm.load({
 });
 var APP_DIR = config.APP_DIR || '/apps';
 
+// TODO: Put in some protection and an optional override
+// when trying to create a repo with a githubId that already exists.
 function Repo(payload) {
   this.normalizePayload(payload);
   this.pkgDotJSON = null;
@@ -29,6 +31,9 @@ function Repo(payload) {
   db.set('nextPort', this.port+1);
 }
 
+Repo.protoype.create = function (payload) {
+  return new Repo(payload);
+}
 
 Repo.prototype.normalizePayload = function(payload) {
   // these params are only passed via a git-hook and are not present
@@ -57,7 +62,6 @@ Repo.prototype.normalizePayload = function(payload) {
     throw new Error("A Repo must be initialized with at least the names of the owner and the repo");
   }
 };
-
 
 Repo.prototype.save = function(cb) {
   //var saveObj = this;
@@ -281,4 +285,7 @@ Repo.prototype.restart = function () {
   }
 };
 
+// TODO: Probably don't need to export the whole class and instead
+// should expose the .create and .retrieve methods only.
+// (for the sake of information hiding and all that crap)
 module.exports = Repo;
