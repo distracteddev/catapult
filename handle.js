@@ -21,6 +21,7 @@ var path   = require('path'),
 
 // Load an empty config for npm
 npm.load({});
+Notifier.start();
 
 var BRANCH_MAP = {'master': 0, 'production': 0, 'staging':1, 'development':2, 'stg':1, 'dev': 2};
 // Child Process storage container.

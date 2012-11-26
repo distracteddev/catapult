@@ -17,6 +17,7 @@ var tailLogs = 'osascript -e \'tell app "Terminal"\n\tdo script "ssh root@{host}
 var STARTED = false;
 
 Notifier.start = function(callback) {
+  callback = callback || function() {};
   if (serverOpts.port && serverOpts.host) {
     Notifier.listen(function(err) {
       if (err) {
