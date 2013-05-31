@@ -35,22 +35,22 @@ Notifier.start = function(callback) {
 // TODO: Remove this hacky bullshit once we refactor the handle submodule
 var BRANCH_MAP = {'master': 0, 'production': 0, 'staging':1, 'development':2, 'stg':1, 'dev': 2};
 
-Notifier.send = function(msg, payload) {
+Notifier.send = function(msg, repo) {
   if (!STARTED) {
     throw new Error('You must start the Notifier before trying to send messages through it');
   }
   var app = {},
       notif = {};
-  // Pull the details we care about out of payload
-  app.name = payload.repository.name;
-  app.branch = payload.branch;
-  app.url = payload.repository.url;
+  // Pull the details we care about out of repo
+  app.name = repo.name
+  app.branch = repo.branch;
+  app.url = repo.name.url;
   // build the notification object
   notif.name = '{1} ({2})'.assign(app.name, app.branch);
   notif.type = msg.type;
   notif.message = msg.text;
   // TODO: Remove this too...
-  notif.url = Object.keys(payload.routes)[BRANCH_MAP[app.branch]];
+  notif.url = Object.keys(repo.routes)[BRANCH_MAP[app.branch]];
 
   // validations and defaults
   if (typeof notif.url !== 'string') {

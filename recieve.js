@@ -5,6 +5,7 @@ var http = require('http');
     ipc     = require('./ipc.js'),
     proxy   = require('./proxy.js'),
     config  = require('./config'),
+    startRepos = require('./helpers').startRepos();
     colors  = require('colors');
 
 var server = http.createServer(function (req, res) {
@@ -32,6 +33,7 @@ var server = http.createServer(function (req, res) {
                 res.end("Error, Bad JSON Provided");
                 return;
               }
+              // console.log(parsed);
               handler(parsed);
             });
         }

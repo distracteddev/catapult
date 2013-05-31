@@ -12,9 +12,9 @@ var db = require('dirty')(dbName);
 
 db.merge = function(key, obj) {
   if (obj) {
-    var current = proxyDB.get(key) || {};
+    var current = db.get(key) || {};
     Object.merge(current, obj, true);
-    proxyDB.set(key, current);
+    db.set(key, current);
   } else {
     throw new Error("proxyDB.merge requires both the key and the object to be merged as parameters");
   }

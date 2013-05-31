@@ -1,4 +1,6 @@
 var fs   = require('fs'),
+    db   = require('./db'),
+    Repo = require('./repo'),
     path = require('path');
 
 exports.getStartFile = function (pkg, directory) {
@@ -14,3 +16,25 @@ exports.getStartFile = function (pkg, directory) {
   }
   return path.join(directory, startFile) || null;
 };
+
+
+
+exports.startRepos = function () {
+  db.on('load', function() {
+    console.log('Starting Repos');
+    var delay = setTimeout(function() {
+      db.forEach(function(id, entry) {
+        // console.log(entry);
+        var isRepo = (entry.id !== undefined);
+        if (isRepo) {
+          var repo = new Repo(entry);
+          repo.start(function(err) {
+            if (err) {
+              console.error('Error Starting Repo on Startup', repo);
+            }
+          });
+        }
+      });
+    }, 200);
+  });
+}
