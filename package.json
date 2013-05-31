@@ -1,6 +1,6 @@
 {
   "name": "catapult",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Node.js Deployment Tool, Intended for use on personal servers",
   "main": "app.js",
   "dependencies": {
