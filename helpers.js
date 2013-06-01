@@ -20,7 +20,7 @@ exports.getStartFile = function (pkg, directory) {
 
 
 exports.startRepos = function () {
-  db.on('load', function() {
+  db.once('load', function() {
     console.log('Starting Repos');
     var delay = setTimeout(function() {
       db.forEach(function(id, entry) {
