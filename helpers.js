@@ -25,7 +25,7 @@ exports.startRepos = function () {
     var delay = setTimeout(function() {
       db.forEach(function(id, entry) {
         // console.log(entry);
-        var isRepo = (entry.id !== undefined);
+        var isRepo = (entry && entry.id !== undefined);
         if (isRepo) {
           var repo = new Repo(entry);
           repo.start(function(err) {
