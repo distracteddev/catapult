@@ -139,7 +139,11 @@ Repo.prototype.syncLocal = function (cb) {
           return cb(err);
         }
         var pkgPath = path.join(that.directory, 'package.json');
-        that.pkgDotJSON = require(pkgPath);
+        try {
+          that.pkgDotJSON = JSON.parse(fs.readFileSync(pkgPath));
+        } catch (e) {
+          throw e;
+        }
         that.buildRoutes();
         that.npmInstall(cb);
       });
