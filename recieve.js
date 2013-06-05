@@ -1,11 +1,12 @@
-var http = require('http');
-    qs  = require('querystring'),
-    sugar = require('sugar'),
-    handler = require('./handle'),
-    ipc     = require('./ipc.js'),
-    proxy   = require('./proxy.js'),
-    config  = require('./config'),
-    startRepos = require('./helpers').startRepos();
+var startAll  = require('./helpers').startRepos,
+    Notifier  = require('./notifier').start(startAll),
+    http      = require('http'),
+    qs        = require('querystring'),
+    sugar     = require('sugar'),
+    handler   = require('./handle'),
+    ipc       = require('./ipc.js'),
+    proxy     = require('./proxy.js'),
+    config    = require('./config'),
     colors  = require('colors');
 
 var server = http.createServer(function (req, res) {

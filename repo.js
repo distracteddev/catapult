@@ -12,8 +12,6 @@ var config      = require('./config'),
     mkdirp      = require('mkdirp'),
     path        = require('path');
 
-
-
 // programmatic npm config
 npm.load({
   loglevel: 'error',
@@ -26,11 +24,13 @@ var APP_DIR = config.APP_DIR || '/apps';
 function Repo(payload) {
 
   this.id = payload.id;
-  
+
+  // id provided, retrieve data from db, attatch to this
   if (this.id) {
     Object.merge(this, this.retrieve(), true);
   }
 
+  // normalize args since we accept githooks as well as client commands
   if (payload) {
     this.normalizePayload(payload);
   }
@@ -39,11 +39,11 @@ function Repo(payload) {
     this.pkgDotJSON = null;
   }
 
+  // If no port is assigned, assign the next one available.
   if (!this.port) {
     this.port = +db.get('nextPort');
     db.set('nextPort', this.port+1);
   }
-  
 }
 
 Repo.create = function (payload) {
@@ -283,7 +283,7 @@ Repo.prototype.start = function (cb) {
 };
 
 // TODO: The Child Listeners should listen on
-// 'start', 'restart', 'exit', and 'error' and 
+// 'start', 'restart', 'exit', and 'error' and
 // update this.status as well as send out notifications
 // using Notifier.send. See Handle.js L189-244 for the old
 // implementation.

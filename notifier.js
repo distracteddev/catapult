@@ -30,6 +30,7 @@ Notifier.start = function(callback) {
       }
     });
   }
+  return this;
 };
 
 // TODO: Remove this hacky bullshit once we refactor the handle submodule
