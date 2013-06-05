@@ -24,7 +24,7 @@ db.on('load', function() {
       router  = {};
 
   db.forEach(function(repo, options) {
-    if (options.routes) {
+    if (options && options.routes) {
       Object.merge(router, options.routes);
     }
   });

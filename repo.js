@@ -207,7 +207,7 @@ Repo.prototype.npmInstall = function (cb) {
   npm.prefix = dir;
   npm.globalPrefix = dir;
   npm.localPrefix = dir;
-  npm.commands.install([], function(err, data) {
+  npm.commands.update([], function(err, data) {
     if (err) {
       console.error('Error Trying to Install NPM Modules');
       cb(err);
