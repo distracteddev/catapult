@@ -7,7 +7,7 @@
  *  4. Start forever with assigned port.
  *
 **/
-var Repo = require('./repo'),
+var Repo = require('./repo');
 
 
 function handleHook(payload) {
